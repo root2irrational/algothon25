@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from statsmodels.tsa.stattools import coint
 
 nInst = 50
 nt = 750
@@ -9,6 +10,7 @@ data = data.T # row = inst [0: 49], col = day [0: 750]
 arr = data
 i = 0
 x = np.arange(arr.shape[1])
+STRONG = 0.9
 
 #after we pick pairs we can make prediction/trade model
 
@@ -45,17 +47,17 @@ def filterCorrelation(corrData, filter):
     if filter == 0:
         for i in range(0, nInst):
             for j in range(0, nInst):
-                if abs(corrData[i][j]) < 0.75:
+                if abs(corrData[i][j]) < STRONG:
                     corrData[i][j] = 0
     elif filter == 1:
         for i in range(0, nInst):
             for j in range(0, nInst):
-                if abs(corrData[i][j]) < 0.75 or corrData[i][j] < 0:
+                if abs(corrData[i][j]) < STRONG or corrData[i][j] < 0:
                     corrData[i][j] = 0
     elif filter == -1:
         for i in range(0, nInst):
             for j in range(0, nInst):
-                if abs(corrData[i][j]) < 0.75 or corrData[i][j] > 0:
+                if abs(corrData[i][j]) < STRONG or corrData[i][j] > 0:
                     corrData[i][j] = 0
     return corrData
 
@@ -69,6 +71,7 @@ def getPairs(pairs, corr):
                 k += 1
     return pairs
 
+# writes corelations and pairs in new files, also assigns to global variables plotPosPairs and plotNegPairs
 def writePairs():
     # allCorr has info on each stocks correlation with each other
     corrData = np.zeros((nInst, nInst))
@@ -90,10 +93,20 @@ def writePairs():
     negPairsFilt = [[val for val in row if val != -1] for row in negPairs]
     posPairsDf = pd.DataFrame(posPairsFilt)
     negPairsDf = pd.DataFrame(negPairsFilt)
-    global plotPosPairs 
-    plotPosPairs = np.copy(posPairsDf)
-    global plotNegPairs 
-    plotNegPairs = np.copy(negPairsDf)
+    global corrPosPairs 
+    corrPosPairs = [
+        (i, val)
+        for i, row in posPairsDf.iterrows()
+        for val in row
+        if pd.notna(val)
+    ]
+    global corrNegPairs
+    corrNegPairs = [
+        (i, val)
+        for i, row in negPairsDf.iterrows()
+        for val in row
+        if pd.notna(val)
+    ]
     
     with open("posPairs.txt", "w") as f:
         for idx, row in posPairsDf.iterrows():
@@ -109,13 +122,40 @@ def writePairs():
 
 writePairs()
 
-arr = plotPosPairs[1]
-arr = np.append(arr, 1)
-arr = arr[~np.isnan(arr)]
-print(arr)
-plotInst(arr)
-arr = plotNegPairs[0]
-arr = arr[~np.isnan(arr)]
-arr = np.append(arr, 0)
-print(arr)
-plotInst(arr)
+cointegrated_pairs = []
+# filters the highly correlated pairs (of 0.9 co-ef) even more
+def coIntegratedTest(cointegrated_pairs):
+    for i, j in corrPosPairs:
+        i, j = int(i), int(j)  # Convert float to int
+        series1 = data[i]
+        series2 = data[j]
+
+        coint_t, p_value, _ = coint(series1, series2)
+
+        if p_value < 0.05:
+            cointegrated_pairs.append((i, j))
+
+    print("Cointegrated +ve pairs:", cointegrated_pairs)
+    arr = list(set([x for tup in cointegrated_pairs for x in tup]))
+    #plotInst(arr)
+    negPairs = []
+    for i, j in corrNegPairs:
+        i, j = int(i), int(j)  # Convert float to int
+        series1 = data[i]
+        series2 = data[j]
+
+        coint_t, p_value, _ = coint(series1, series2)
+
+        if p_value < 0.05:
+            negPairs.append((i, j))
+            cointegrated_pairs.append((i, j))
+
+    print("Cointegrated -ve pairs:", negPairs)
+    arr = list(set([x for tup in negPairs for x in tup]))
+    #plotInst(arr)
+    
+    return
+
+coIntegratedTest(cointegrated_pairs)
+cointegrated_pairs = set(tuple(sorted(cointegrated_pairs)) for cointegrated_pairs in cointegrated_pairs)
+print(cointegrated_pairs)
