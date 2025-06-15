@@ -43,22 +43,13 @@ filters correlation array, leaving only strong ones
                     + 1 means only take strong positive
                     0 means take both strong pos and strong neg
 """
-def filterCorrelation(corrData, filter):
-    if filter == 0:
-        for i in range(0, nInst):
-            for j in range(0, nInst):
-                if abs(corrData[i][j]) < STRONG:
-                    corrData[i][j] = 0
-    elif filter == 1:
-        for i in range(0, nInst):
-            for j in range(0, nInst):
-                if abs(corrData[i][j]) < STRONG or corrData[i][j] < 0:
-                    corrData[i][j] = 0
-    elif filter == -1:
-        for i in range(0, nInst):
-            for j in range(0, nInst):
-                if abs(corrData[i][j]) < STRONG or corrData[i][j] > 0:
-                    corrData[i][j] = 0
+def filterCorrelation(corrData, filterNum):
+    if filterNum == 0:
+        return np.where(abs(corrdata) < STRONG, 0, corrdata)
+    elif filterNum == 1:
+        return np.where(abs(corrData[i][j]) < STRONG or corrData[i][j] < 0, 0, corrData)
+    elif filterNum == -1:
+        return np.where(abs(corrData[i][j]) < STRONG or corrData[i][j] > 0, 0, corrData)
     return corrData
 
 # returns 2D array. arr[0][0] = 21 means stock i = 0 can be paired with stock 21
