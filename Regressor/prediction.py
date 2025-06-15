@@ -47,9 +47,9 @@ def filterCorrelation(corrData, filterNum):
     if filterNum == 0:
         return np.where(abs(corrdata) < STRONG, 0, corrdata)
     elif filterNum == 1:
-        return np.where(abs(corrData) < STRONG or corrData < 0, 0, corrData)
+        return np.where(corrData < STRONG, 0, corrData)
     elif filterNum == -1:
-        return np.where(abs(corrData) < STRONG or corrData > 0, 0, corrData)
+        return np.where(corrData > -STRONG, 0, corrData)
     return corrData
 
 # returns 2D array. arr[0][0] = 21 means stock i = 0 can be paired with stock 21
