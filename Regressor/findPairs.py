@@ -4,8 +4,11 @@ import matplotlib.pyplot as plt
 from statsmodels.tsa.stattools import coint
 from statsmodels.tsa.arima.model import ARIMA
 
+global nInst 
 nInst = 50
+global nt 
 nt = 750
+global data
 data = np.loadtxt('prices.txt')
 data = data.T # row = inst [0: 49], col = day [0: 750]
 STRONG = 0.9
@@ -157,8 +160,8 @@ def run():
     global log_returns
     log_returns = np.log(data[:, 1:] / data[:, :-1])
     log_returns = np.hstack((np.zeros((data.shape[0], 1)), log_returns))  # shape: (n, 750)
-    arr =  np.array(next(iter(cointegrated_pairs)))
-    arr = np.delete(arr, -1)
-    plotLogReturns(arr)
+    # arr =  np.array(next(iter(cointegrated_pairs)))
+    # arr = np.delete(arr, -1)
+    # plotLogReturns(arr)
     return
 run()
