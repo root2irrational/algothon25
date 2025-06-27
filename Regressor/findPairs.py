@@ -13,22 +13,6 @@ data = np.loadtxt('prices.txt')
 data = data.T # row = inst [0: 49], col = day [0: 750]
 STRONG = 0.9
 
-#after we pick pairs we can make prediction/trade model
-
-# just a general visualiser, plots prices for all instruments in array (on same axis)
-def plotInst(arr):
-    x = np.arange(data.shape[1])
-    for i in range(0, len(arr)):
-        plt.plot(x, data[i], label='Instrument ' + str(arr[i]))
-        plt.xlabel("Day")
-        plt.ylabel("Price")
-        plt.grid(True)
-        plt.legend()
-
-    plt.title("Instruments:")
-    plt.show()
-    return
-
 # gets correlation array of instruments, arr[i][j] is correlation co-ef of instrument i with instrument j
 def getCorrelation(corrData):
     for i in range(0, nInst):
@@ -116,39 +100,26 @@ def coIntegratedTest(cointegrated_pairs):
         if p_value < 0.05:
             cointegrated_pairs.append((i, j))
 
-    #print("Cointegrated +ve pairs:", cointegrated_pairs)
-    #arr = list(set([x for tup in cointegrated_pairs for x in tup]))
-    #plotInst(arr)
-    # negPairs = []
-    # for i, j in corrNegPairs:
-    #     i, j = int(i), int(j)  # Convert float to int
-    #     series1 = data[i]
-    #     series2 = data[j]
+    print("Cointegrated +ve pairs:", cointegrated_pairs)
+    arr = list(set([x for tup in cointegrated_pairs for x in tup]))
+    negPairs = []
+    for i, j in corrNegPairs:
+        i, j = int(i), int(j)  # Convert float to int
+        series1 = data[i]
+        series2 = data[j]
 
-    #     coint_t, p_value, _ = coint(series1, series2)
+        coint_t, p_value, _ = coint(series1, series2)
 
-    #     if p_value < 0.05:
-    #         negPairs.append((i, j))
-    #         cointegrated_pairs.append((i, j))
+        if p_value < 0.05:
+            negPairs.append((i, j))
+            cointegrated_pairs.append((i, j))
 
-    # print("Cointegrated -ve pairs:", negPairs)
-    # arr = list(set([x for tup in negPairs for x in tup]))
+    print("Cointegrated -ve pairs:", negPairs)
+    arr = list(set([x for tup in negPairs for x in tup]))
     #plotInst(arr)
     
     return
 
-def plotLogReturns(arr):
-    x = np.arange(data.shape[1])
-    for i in range(0, len(arr)):
-        plt.plot(x, log_returns[i], label='Instrument ' + str(arr[i]))
-        plt.xlabel("Day")
-        plt.ylabel("log return")
-        plt.grid(True)
-        plt.legend()
-
-    plt.title("Instruments:")
-    plt.show()
-    return
 
 def run():
     filterPairs()
@@ -156,12 +127,6 @@ def run():
     cointegrated_pairs = []
     coIntegratedTest(cointegrated_pairs)
     cointegrated_pairs = set(tuple(sorted(cointegrated_pairs)) for cointegrated_pairs in cointegrated_pairs)
-    print(cointegrated_pairs)
-    global log_returns
-    log_returns = np.log(data[:, 1:] / data[:, :-1])
-    log_returns = np.hstack((np.zeros((data.shape[0], 1)), log_returns))  # shape: (n, 750)
-    # arr =  np.array(next(iter(cointegrated_pairs)))
-    # arr = np.delete(arr, -1)
-    # plotLogReturns(arr)
+    print(f"All sign pairs: {cointegrated_pairs}")
     return
 run()
