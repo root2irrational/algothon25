@@ -18,26 +18,38 @@ prc = prc[stock]
 rt = rt[stock]
 idx = int(np.ceil(0.8 * len(prc)))
 # print(idx)
-train = prc[0:idx]
+train = prc[0:idx]  # remember boxcox -> differencing
 test = prc[idx:len(prc)]
 
+def corr(prcSoFar):
+  nInst, nt = prcSoFar.shape
+  corr = np.zeros((nInst, nInst))
+  for i in range(0, nInst):
+    for j in range(0, nInst):
+      if j != i:
+        r = np.corrcoef(prcSoFar[i], prcSoFar[j])
+        corr[i][j] = r[0, 1]
+  return corr
 
-# train[1:] - train[:-1] first order differencing
-trainBoxcox, lambda_mle = boxcox(train)
-trainDiff = np.diff(trainBoxcox)
-testBoxcox, lambda_mle_test = boxcox(test)
-testDiff = np.diff(testBoxcox)
-trainLogRt = np.diff(np.log(train))
-testLogRt = np.diff(np.log(test))
+def filterCorr(prcSoFar, strength):
+  corrData = corr(prcSoFar)
+  if (strength < 0):
+    return np.where(corrData < strength, corrData, 0)
+  elif (strength > 0):
+    return np.where(corrData > strength, corrData, 0)
+  return corrData
+    
 
 def isStationary(series):
   result = adfuller(series)
-  print("ADF Statistic:", result[0])
-  print("p-value:", result[1])
-  print("Critical Values:")
-  for key, value in result[4].items():
-    print(f"  {key}: {value}")
-  return
+  # print("ADF Statistic:", result[0])
+  # print("p-value:", result[1])
+  # print("Critical Values:")
+  # for key, value in result[4].items():
+  #   print(f"  {key}: {value}")
+  if (result[1] < 0.01):
+    return True
+  return False
 
 def pcf(data):
   plt.rc("figure", figsize=(11,5))
@@ -56,8 +68,8 @@ def plotTimeSeries(series1, series2):
   if len(series2) == 0:
     series2 = np.zeros(len(series1))
 
-  plt.plot(x, series1, label='pred')
-  plt.plot(x, series2, label='test')
+  plt.plot(x, series1, label='series1')
+  plt.plot(x, series2, label='series2')
   plt.legend()
   plt.title('pred vs test')
   plt.xlabel('day')
@@ -78,22 +90,13 @@ def convertForecastFromDiff(transformed_forecasts):
   forecasts = inv_boxcox(boxcox_forecasts, lambda_mle)
   return forecasts
 
-def arModel(series):
-  lags = 1
+def arModel(series, lags, test):
   selector = ar_select_order(series, lags)
   model = AutoReg(series, lags=selector.ar_lags).fit()
-  against = testLogRt
+  against = test
   transformed_forecasts = list(model.forecast(steps=len(against)))
   pred = transformed_forecasts
   last_price = train[-1]
   pred = last_price * np.exp(np.cumsum(transformed_forecasts))
   return pred
 
-# isStationary(rt)
-# plotTimeSeries(rt[0:100], rt[0:100])
-# plotTimeSeries(trainBoxcox, [])
-# plotTimeSeries(trainDiff, [])
-# pcf(rt) # stock2: somewhat significant lags = 3,4,7, stop at 7. 13,15,24,27
-# model = arModel(trainLogRt)
-# # print(model.shape)
-# plotTimeSeries(model, testLogRt)

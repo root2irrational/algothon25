@@ -4,7 +4,6 @@ import numpy as np
 import pandas as pd
 # from Regressor.main import getMyPosition as getPosition
 from main import getMyPosition as getPosition
-from main import predictPriceNextDay, predictReturnNextDay
 nInst = 50
 nt = 0
 commRate = 0.0005
@@ -30,10 +29,7 @@ def calcPL(prcHist, numTestDays):
     todayPLL = []
     (_,nt) = prcHist.shape
     startDay = nt + 1 - numTestDays
-    predictAllDays = [] ###
-    predictReturn = []
-    actualReturns = []
-    actualPrices = [] ###
+
     for t in range(startDay, nt+1):
         prcHistSoFar = prcHist[:,:t]
         curPrices = prcHistSoFar[:,-1]
@@ -48,17 +44,7 @@ def calcPL(prcHist, numTestDays):
             totDVolume += dvolume
             comm = dvolume * commRate
             cash -= curPrices.dot(deltaPos) + comm
-            #######
-            predicted = predictPriceNextDay(prcHistSoFar)
-            predictAllDays.append(predicted)
-            actualNextDayPrice = prcHist[:, t]
-            actualPrices.append(actualNextDayPrice)
-            predictReturn.append(predictReturnNextDay(prcHistSoFar))
-            next_day_return = prcHist[:, t] / prcHist[:, t-1]
-            actualReturns.append(next_day_return)
-            
-            returns = np.ones_like(prcHist)  # initialize with 1s
-            returns[:, 1:] = (prcHist[:, 1:] / prcHist[:, :-1])
+
         else:
             newPos = np.array(curPos)
         curPos = np.array(newPos)
@@ -76,33 +62,8 @@ def calcPL(prcHist, numTestDays):
     annSharpe = 0.0
     if (plstd > 0):
         annSharpe = np.sqrt(249) * plmu / plstd
-    predictAllDays = np.array(predictAllDays)
-    actualPrices = np.array(actualPrices)
-    actualReturns = np.array(actualReturns)
-    actualReturns = actualReturns.T
-    predictReturn = np.array(predictReturn)
-    predictReturn = predictReturn.T
-    mse = np.mean((predictAllDays - actualPrices) ** 2)
-    perStockMSE = np.mean((predictAllDays - actualPrices) ** 2, axis=0)
-    print(predictReturn.shape)
-    print(actualReturns.shape)
-    max = 0
-    for i in range(0, 50):
-        #print(f"Stock {i}: MSE Price = {stock_mse:.4f}")
-        threshold = 0
-        a = actualReturns[i]
-        p = predictReturn[i]
-        mse = np.mean((a - p) ** 2)
-        mad = np.mean(np.abs(a - p))
-        if (mad > max):
-            max = mad
-        # print(f'Returns {i} MAD: {mad} MSE: {mse}')
-    
-        
-    print("Max Return MAD:", max)
 
     return (plmu, ret, plstd, annSharpe, totDVolume)
-
 
 
 (meanpl, ret, plstd, sharpe, dvol) = calcPL(prcAll,200)
@@ -114,15 +75,3 @@ print ("StdDev(PL): %.2lf" % plstd)
 print ("annSharpe(PL): %.2lf " % sharpe)
 print ("totDvolume: %.0lf " % dvol)
 print ("Score: %.2lf" % score)
-
-# numTestDays = 200
-# todayPLL = []
-# (_,nt) = prcAll.shape
-# startDay = nt + 1 - numTestDays
-# print("Prediction MSE's")
-# nInst = 50
-# for i in range(startDay, nt + 1):
-#     allPred = np.zeros((nInst, numTestDays))
-#     dailyPred = np.zeros(nInst)
-#     dailyPred = predictPriceNextDay(prcAll[ :, 0:i])
-#     break

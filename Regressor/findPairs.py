@@ -11,8 +11,9 @@ nt = 750
 global data
 data = np.loadtxt('prices.txt')
 data = data.T # row = inst [0: 49], col = day [0: 750]
-STRONG = 0.9
-
+STRONG = 0.8
+global cointegratedPosPairs
+cointegratedPosPairs = []
 # gets correlation array of instruments, arr[i][j] is correlation co-ef of instrument i with instrument j
 def getCorrelation(corrData):
     for i in range(0, nInst):
@@ -62,6 +63,7 @@ def filterPairs():
     posStrongCorr = np.copy(corrData)
     negStrongCorr = np.copy(corrData)
     posStrongCorr = filterCorrelation(posStrongCorr, 1)
+    
     negStrongCorr = filterCorrelation(negStrongCorr, -1)
     posPairs = np.full((nInst, nInst), -1) # not setting to 0 since stock i can be paired with stock 0
     negPairs = np.full((nInst, nInst), -1)
@@ -70,7 +72,11 @@ def filterPairs():
     posPairsFilt = [[val for val in row if val != -1] for row in posPairs] # Remove all -1s from each row
     negPairsFilt = [[val for val in row if val != -1] for row in negPairs]
     posPairsDf = pd.DataFrame(posPairsFilt)
+    with open("posPairs.txt", "w") as f:
+        f.write(posPairsDf.to_string(index=False))
     negPairsDf = pd.DataFrame(negPairsFilt)
+    with open("negPairs.txt", "w") as f:
+        f.write(negPairsDf.to_string(index=False))
     global corrPosPairs 
     corrPosPairs = [
         (i, val)
@@ -90,18 +96,25 @@ def filterPairs():
 
 # filters the highly correlated pairs (of 0.9 co-ef) even more
 def coIntegratedTest(cointegrated_pairs):
+    seen_pairs = set()
     for i, j in corrPosPairs:
         i, j = int(i), int(j)  # Convert float to int
         series1 = data[i]
         series2 = data[j]
-
+        pair = tuple(sorted((i, j)))
+        
+        if pair in seen_pairs:
+            continue
         coint_t, p_value, _ = coint(series1, series2)
-
-        if p_value < 0.05:
-            cointegrated_pairs.append((i, j))
+        
+        if p_value < 0.1:
+            cointegrated_pairs.append([i, j])
+            seen_pairs.add(pair)
 
     print("Cointegrated +ve pairs:", cointegrated_pairs)
-    arr = list(set([x for tup in cointegrated_pairs for x in tup]))
+    
+    # cointegratedPosPairs = np.array(list(seen_pairs))
+    # cointegrated_pairs = np.array([list(pair) for pair in seen_pairs])
     negPairs = []
     for i, j in corrNegPairs:
         i, j = int(i), int(j)  # Convert float to int
@@ -110,12 +123,12 @@ def coIntegratedTest(cointegrated_pairs):
 
         coint_t, p_value, _ = coint(series1, series2)
 
-        if p_value < 0.05:
+        if p_value < 0.1:
             negPairs.append((i, j))
             cointegrated_pairs.append((i, j))
 
     print("Cointegrated -ve pairs:", negPairs)
-    arr = list(set([x for tup in negPairs for x in tup]))
+    # arr = list(set([x for tup in negPairs for x in tup]))
     #plotInst(arr)
     
     return

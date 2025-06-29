@@ -1,50 +1,51 @@
-row 0:   
-row 1:   
-row 2: 4.0 6.0 20.0
-row 3:   
-row 4: 2.0 6.0 20.0
-row 5:   
-row 6: 2.0 4.0 
-row 7:   
-row 8:   
-row 9:   
-row 10:   
-row 11: 23.0  
-row 12:   
-row 13:   
-row 14:   
-row 15:   
-row 16:   
-row 17:   
-row 18:   
-row 19:   
-row 20: 2.0 4.0 
-row 21:   
-row 22:   
-row 23: 11.0  
-row 24:   
-row 25:   
-row 26:   
-row 27:   
-row 28:   
-row 29:   
-row 30:   
-row 31:   
-row 32:   
-row 33:   
-row 34:   
-row 35:   
-row 36:   
-row 37:   
-row 38:   
-row 39:   
-row 40:   
-row 41:   
-row 42:   
-row 43:   
-row 44:   
-row 45:   
-row 46:   
-row 47:   
-row 48:   
-row 49:   
+   0    1    2    3    4    5    6    7    8
+ NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN
+ 6.0 19.0 33.0  NaN  NaN  NaN  NaN  NaN  NaN
+ 4.0  6.0 16.0 19.0 20.0 35.0 43.0 47.0  NaN
+ NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN
+ 2.0  6.0 16.0 20.0 35.0 47.0  NaN  NaN  NaN
+27.0 30.0  NaN  NaN  NaN  NaN  NaN  NaN  NaN
+ 1.0  2.0  4.0 16.0 19.0 20.0 33.0 43.0 47.0
+11.0 13.0  NaN  NaN  NaN  NaN  NaN  NaN  NaN
+ NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN
+14.0 27.0 31.0  NaN  NaN  NaN  NaN  NaN  NaN
+ NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN
+ 7.0 13.0 23.0 39.0  NaN  NaN  NaN  NaN  NaN
+ NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN
+ 7.0 11.0  NaN  NaN  NaN  NaN  NaN  NaN  NaN
+ 9.0 31.0  NaN  NaN  NaN  NaN  NaN  NaN  NaN
+ NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN
+ 2.0  4.0  6.0 20.0 30.0  NaN  NaN  NaN  NaN
+ NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN
+ NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN
+ 1.0  2.0  6.0 20.0 47.0  NaN  NaN  NaN  NaN
+ 2.0  4.0  6.0 16.0 19.0 35.0 47.0  NaN  NaN
+31.0  NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN
+29.0  NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN
+11.0 39.0  NaN  NaN  NaN  NaN  NaN  NaN  NaN
+ NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN
+33.0  NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN
+ NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN
+ 5.0  9.0 30.0 31.0  NaN  NaN  NaN  NaN  NaN
+ NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN
+22.0 42.0  NaN  NaN  NaN  NaN  NaN  NaN  NaN
+ 5.0 16.0 27.0  NaN  NaN  NaN  NaN  NaN  NaN
+ 9.0 14.0 21.0 27.0  NaN  NaN  NaN  NaN  NaN
+ NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN
+ 1.0  6.0 25.0  NaN  NaN  NaN  NaN  NaN  NaN
+ NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN
+ 2.0  4.0 20.0 47.0  NaN  NaN  NaN  NaN  NaN
+ NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN
+ NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN
+ NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN
+11.0 23.0  NaN  NaN  NaN  NaN  NaN  NaN  NaN
+ NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN
+ NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN
+29.0  NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN
+ 2.0  6.0  NaN  NaN  NaN  NaN  NaN  NaN  NaN
+ NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN
+ NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN
+ NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN
+ 2.0  4.0  6.0 19.0 20.0 35.0  NaN  NaN  NaN
+49.0  NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN
+48.0  NaN  NaN  NaN  NaN  NaN  NaN  NaN  NaN
