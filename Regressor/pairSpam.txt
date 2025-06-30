@@ -45,3 +45,39 @@ pairs = np.array([[2, 6], [2, 20], [11, 23], [22, 29], [29, 42], [31, 9], [33, 1
 #    [33, 19], [33, 20], [33, 30], [33, 35], [33, 47], [37, 0], [37, 19], [37, 25], [48, 11], [48, 12], 
 #    [48, 17], [48, 23], [48, 24], [48, 29], [48, 34], [48, 39], [48, 42], [48, 49]]
 # )
+
+def convertForecastFromDiff(transformed_forecasts):
+  boxcox_forecasts = []
+  for idx in range(len(test)):
+    if idx == 0:
+      boxcox_forecast = transformed_forecasts[idx] + trainBoxcox[-1]
+    else:
+      boxcox_forecast = transformed_forecasts[idx] + boxcox_forecasts[idx-1]
+
+    boxcox_forecasts.append(boxcox_forecast)
+
+  forecasts = inv_boxcox(boxcox_forecasts, lambda_mle)
+  return forecasts
+
+def arModel(series, lags, test):
+  selector = ar_select_order(series, lags)
+  model = AutoReg(series, lags=selector.ar_lags).fit()
+  against = test
+  transformed_forecasts = list(model.forecast(steps=len(against)))
+  pred = transformed_forecasts
+  last_price = train[-1]
+  pred = last_price * np.exp(np.cumsum(transformed_forecasts))
+  return pred
+
+# corr = 0.8, coint < 0.1
+pairs = np.array(
+  [[2, 6], [2, 16], [2, 20], [2, 35], [6, 20], [7, 11], [7, 13], [9, 31], [11, 13], 
+  [11, 23], [11, 39], [14, 31], [22, 29], [25, 33], [29, 42], [31, 21], [31, 27], 
+  [33, 1], [33, 6], [35, 20], [43, 2], [48, 49]])
+
+# corr = 0.8, coint < 0.1
+negPairs = np.array(
+  [[1, 49], [2, 22], [2, 29], [6, 22], [6, 29], [16, 22], [16, 29], [20, 22], [22, 2], 
+   [22, 4], [22, 6], [22, 16], [22, 20], [22, 35], [25, 49], [29, 2], [29, 6], [29, 16], 
+   [33, 49], [35, 22], [49, 1], [49, 25], [49, 33]]
+)

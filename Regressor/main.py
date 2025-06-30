@@ -1,7 +1,6 @@
 
 import numpy as np
-import matplotlib.pyplot as plt
-from trade import pairsTradeSpread, windowSysytem, momentumTrade, maCrossover, longShortRandom, longShortCointegrated, IndexMomentum, reverseTrades
+from trade import pairsTradeSpread, windowSysytem, IndexMomentum, reverseTrades
 
 #from trade import predictReturnNextDay, predictPriceNextDay
 # predictAll, daysTraded,
@@ -20,15 +19,15 @@ def getMyPosition(prcSoFar):
     global currentPos
     (nins, nt) = prcSoFar.shape
     currentPos = np.zeros(nins)
-    if (nt <= windowSysytem * 5):
+    if (nt <= windowSysytem):
         return currentPos
     # currentPos = longShortCointegrated(prcSoFar, currentPos)
     # currentPos = longShortRandom(prcSoFar, currentPos)
-    if (IndexMomentum(prcSoFar) != -1):
-        return currentPos
+    # if (IndexMomentum(prcSoFar) != 0):
+    #     return currentPos
     currentPos = pairsTradeSpread(prcSoFar, currentPos)
     # currentPos = momentumTrade(prcSoFar, currentPos)
     # currentPos = maCrossover(prcSoFar, currentPos)
     # if (nt <= 500):
-    #     currentPos = reverseTrades(currentPos)
+    # currentPos = reverseTrades(currentPos)
     return currentPos
