@@ -37,14 +37,19 @@ def filterCorr(prcSoFar, strength):
     return np.where(corrData > strength, corrData, 0)
   return corrData
     
-
+def writeCorrData(matrix):
+  with open("output.txt", "w") as f:
+    for row in matrix:
+      f.write(" ".join(map(str, row)) + "\n")
+    return
+  
 def isStationary(series):
   result = adfuller(series)
-  # print("ADF Statistic:", result[0])
-  # print("p-value:", result[1])
-  # print("Critical Values:")
-  # for key, value in result[4].items():
-  #   print(f"  {key}: {value}")
+  print("ADF Statistic:", result[0])
+  print("p-value:", result[1])
+  print("Critical Values:")
+  for key, value in result[4].items():
+    print(f"  {key}: {value}")
   if (result[1] < 0.01):
     return True
   return False
@@ -135,13 +140,4 @@ def spreadHalfLife(spread):
   halflife = -np.log(2) / beta if beta < 0 else np.inf
   return halflife
 
-# c = filterCorr(prc, 0.80)
-# cp = cointegratedPairs(prc, c, 0.05)
-# print("\n Default pairs \n")
-# print(cp)
-# # s = sortPairsPvalue(cp)
-# # print("\n CP S by pvalue: \n")
-# # print(s)
-# s = sortPairsHalfLife(cp)
-# print("\n CP S by Half life \n: ")
-# print(s)
+

@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.stats import boxcox
 from timeSeries import filterCorr, plotTimeSeries, isStationary, spreadHalfLife, pcf, calcSpread, cointegratedPairs, sortPairsHalfLife
 window1 = 2
 window2 = 5
@@ -15,23 +16,6 @@ prc = data.T
 # rt[:, 1:] = (prc[:, 1:] / prc[:, :-1]) # returns
 
 pairs = np.array([[6,2],[20,2],[ 7,13],[11,13],[11,23],[29,22],[42,29],[31,9],[31,14],[33,1],[33,6],[49,48]])
-# def getPairsTuples(prcSoFar, strength, pValue):
-#   corr = filterCorr(prcSoFar, strength)
-#   cp = cointegratedPairs(prcSoFar, corr, pValue)
-#   s = sortPairsHalfLife(cp)
-#   # [i, j, pValue, halfLife]
-#   return [[i, j, p, h] for i, j, p, h in s]
-
-# def getPairs(prcSoFar, strength, pValue):
-#   s = getPairsTuples(prcSoFar, strength, pValue)
-#   return [[i, j] for i, j, _, _ in s]
-
-# pairs = np.array(getPairs(prc, 0.8, 0.05))
-# (r,c) = pairs.shape
-# pairs = getPairsTuples(prc, 0.8, 0.05)
-# print(f"Number of ++pairs r {r}")
-# print(" \nPairs are \n")
-# print(pairs)
 
 def reverseTrades(position):
   for i in range(0, 50):
@@ -108,18 +92,16 @@ def pairsTradeSpread(prcSoFar, position):
     #   continue
     spreadRt = spread[1:] / spread[:-1]
     spreadRt -= np.ones_like(spreadRt)
-    w = 50
+    w = 20
     mom = np.sum(spreadRt[-w:])
     S = 0
-    if (halfLife > 5):
-      if (-0.55 * w < mom < -0.25 * w):
+    F = 0.8
+    # halfLife > 5
+    if (abs(mom) > F * w):
+      if (mom < -F * w):
         S = -1
-      elif(mom < -0.55 * w):
+      elif (mom > F * w):
         S = 1
-      elif (0.75 * w >= mom > 0.25 * w):
-        S = 1
-      elif (mom > 0.75 * w):
-        S = -1
       # S = -S
     else:
       S = spreadTradeSignal(spread)
@@ -154,8 +136,12 @@ def checkSpreadSeries(arr):
     # pcf(spread)
   return
 
-# checkSpreadSeries(np.array([[2,6], [11,23]]))
-# non stationary = [2,6], [2, 20], [11, 23], [22, 29], [29, 42 iffy], [31, 9], [33,1]
 
-# arr = syntheticIndex(prc)
-# plotTimeSeries(arr, arr)
+arr = syntheticIndex(prc)
+arr = arr[2:] - arr[:-2] # lags 1,2,3
+
+isStationary(arr)
+x = spreadHalfLife(arr)
+print(x)
+plotTimeSeries(arr, arr)
+pcf(arr)
