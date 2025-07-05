@@ -4,6 +4,8 @@ import statsmodels.api as sm
 from statsmodels.tsa.stattools import adfuller
 from statsmodels.graphics.tsaplots import plot_pacf
 from statsmodels.tsa.stattools import coint
+from statsmodels.tsa.ar_model import AutoReg
+import pandas as pd
 
 season_trend = 5
 stock = 2
@@ -140,4 +142,60 @@ def spreadHalfLife(spread):
   halflife = -np.log(2) / beta if beta < 0 else np.inf
   return halflife
 
+def arModel(arr, lag):
+  model = AutoReg(arr, lags=lag, old_names=False)
+  model_fit = model.fit()
+  return model_fit
 
+def group_correlated_stocks(corr_matrix, threshold):
+    n = corr_matrix.shape[0]
+    # Build adjacency list for graph: edge exists if corr > threshold
+    adjacency = {i: set() for i in range(n)}
+    for i in range(n):
+        for j in range(i+1, n):
+            if corr_matrix[i][j] > threshold:
+                adjacency[i].add(j)
+                adjacency[j].add(i)
+
+    visited = set()
+    groups = []
+
+    def dfs(node, group):
+        visited.add(node)
+        group.append(node)
+        for neighbor in adjacency[node]:
+            if neighbor not in visited:
+                dfs(neighbor, group)
+
+    for stock in range(n):
+        if stock not in visited:
+            group = []
+            dfs(stock, group)
+            groups.append(sorted(group))
+
+    return groups
+
+# arr = 2D, each row is its own series
+def plotMultipleSeries(arr):
+  x = np.arange(0, len(arr[0]))
+  for i in range(0, len(arr)):
+    plt.plot(x, arr[i], label=f'series{i}')
+
+  plt.legend()
+  plt.title('pred vs test')
+  plt.xlabel('day')
+  plt.ylabel('prc')
+  plt.show()
+  return
+
+def syntheticIndexGivenStocks(arr, prcSoFar):
+  arr = list(arr)
+  selected_prices = prcSoFar[arr, :]
+  synthetic_index = np.mean(selected_prices, axis=0)
+
+  return synthetic_index
+
+def ema(arr, days):
+  arr = pd.Series(arr)
+  ema = arr.ewm(span=days, adjust=False).mean()
+  return ema
