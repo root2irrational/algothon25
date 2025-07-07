@@ -1,7 +1,7 @@
 
 import numpy as np
 from trade import pairsTradeSpread, windowSysytem, IndexMomentum, reverseTrades, multiPairIndex, ema3Trade, priceRatioEma, multiplePairsEma
-
+from trade import ema3Spread, spreadWeakStrongCorr, experiment2
 #from trade import predictReturnNextDay, predictPriceNextDay
 # predictAll, daysTraded,
 ##### TODO #########################################
@@ -22,23 +22,22 @@ def getMyPosition(prcSoFar):
     if (nt <= windowSysytem):
         return currentPos
 
-    # arr = [1, 4, 6]
-    #    [2, 16], [5, 9, 14, 27], [29, 42]
-    # [2, 16], [1, 4, 6, 19, 20, 47], [1, 4, 6], [29,42]
-    # 0.75 [1, 2, 4, 5, 6, 7, 9, 13, 14, 15, 16, 18, 19, 20, 25, 27, 30, 33, 34, 35, 38, 41, 43, 44, 47]
-    groups = [[1, 2, 4, 6, 16, 18, 19, 20, 25, 33, 35, 38, 47]]
-    groups = [[1,4,6]]
-    # groups = [
-    #     [1, 2, 4, 5, 6, 7, 9, 13, 14, 15, 16, 18, 19, 20, 25, 27, 30, 33, 34, 35, 38, 41, 43, 44, 47]
-    #     ]
-    # currentPos = multiPairIndex(groups, prcSoFar, currentPos)
-    currentPos = ema3Trade(8,13,21,prcSoFar, currentPos)
-    pairs = [[1, 2], [4, 5], [6, 7], [9, 13], [14, 15], [16, 18], [19, 20], [25, 27], [30, 33], [34, 35], [38, 41], [43, 44]]
-    pairs = [[0,2]]
-    currentPos = multiplePairsEma(np.array(pairs),prcSoFar, currentPos)
-    # currentPos = momentumTrade(prcSoFar, currentPos)
-    # currentPos = maCrossover(prcSoFar, currentPos)
-    # if (nt <= 500):
-
+    pairs = [[8, 30], [9, 11], [10, 24], [19, 31]]
+    pairs = [[1, 5], [1, 14], [2, 36], [2, 41], [3, 22], [3, 48], [4, 37], [5, 24], [7, 9], [7, 24], 
+             [7, 45], [8, 18], [8, 30], [9, 11], [9, 12], [9, 23], [9, 48], [10, 24], [10, 28], [10, 41], 
+             [11, 14], [11, 41], [13, 45], [14, 23], [14, 46], [15, 24], [16, 37], [17, 27], [19, 31], [19, 44], 
+             [22, 36], [22, 37], [23, 28], [23, 38], [23, 41], [25, 40], [28, 39], [31, 46], [31, 49], [33, 40], 
+             [35, 37], [36, 41], [36, 47], [39, 45], [40, 43], [41, 42], [41, 43]]
+    pairs = [
+        [8,30], [2,6], 
+        [36,47], [11,23], 
+        [6,3], [40, 43],
+        [7,13], [14, 46]
+        ]
+    # pairs = [[2,6]]
+    # pairs = [[8,30]]
+    # currentPos = ema3Spread(8,13,21,pairs,prcSoFar,currentPos)
+    # currentPos = spreadWeakStrongCorr(8,13,21,pairs,prcSoFar,currentPos)
+    currentPos = experiment2(prcSoFar, currentPos)
     currentPos = reverseTrades(currentPos)
     return currentPos

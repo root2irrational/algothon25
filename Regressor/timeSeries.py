@@ -6,6 +6,7 @@ from statsmodels.graphics.tsaplots import plot_pacf
 from statsmodels.tsa.stattools import coint
 from statsmodels.tsa.ar_model import AutoReg
 import pandas as pd
+from scipy.stats import norm
 
 season_trend = 5
 stock = 2
@@ -40,9 +41,15 @@ def filterCorr(prcSoFar, strength):
   return corrData
     
 def writeCorrData(matrix):
-  with open("output.txt", "w") as f:
-    for row in matrix:
-      f.write(" ".join(map(str, row)) + "\n")
+    with open("allCorr.txt", "w") as f:
+        n = len(matrix)
+        # Write column headers
+        f.write("       " + "  ".join(f"{j:>2}" for j in range(n)) + "\n")
+        
+        # Write each row with its label
+        for i, row in enumerate(matrix):
+            row_str = "  ".join(f"{val:>6.3f}" for val in row)  # format values nicely
+            f.write(f"{i:>2}  {row_str}\n")
     return
   
 def isStationary(series):
@@ -199,3 +206,29 @@ def ema(arr, days):
   arr = pd.Series(arr)
   ema = arr.ewm(span=days, adjust=False).mean()
   return ema
+
+def findLowCorrPairs(corrData, threshold_low, threshold_high):
+    n = len(corrData)
+    pairs = []
+
+    for i in range(n):
+        for j in range(i+1, n):  # ensures i < j → no duplicates or self-pairs
+            corr = corrData[i][j]
+            if threshold_low < corr < threshold_high:
+                pairs.append((i, j))
+
+    return pairs
+
+def plotHistogram(prices):
+  # Assuming prices is a 1D array or list
+  plt.hist(prices, bins=30, density=True, edgecolor='black')
+  xmin, xmax = plt.xlim()
+  mu, std = norm.fit(prices)
+  x = np.linspace(xmin, xmax, 100)
+  p = norm.pdf(x, mu, std)
+  plt.plot(x, p, 'r', linewidth=2)
+  plt.title(f"Normal Fit: μ = {mu:.2f}, σ = {std:.2f}")
+  plt.xlabel('Price')
+  plt.ylabel('Density')
+  plt.show()
+  return
